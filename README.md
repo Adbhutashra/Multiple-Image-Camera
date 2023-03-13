@@ -20,7 +20,7 @@ know whether this package might be useful for them.
 - You can Switch Camera if you want to take photo from front Camera.
 - Take Multiple Photos at once and them in the list.
 - This package contains pre-canned animations for commonly-desired effects.
-- This package also have Camera shutter sound and vibration.
+- This package also have Camera shutter vibration.
 - Ability for Show images that are clicked and added to the list.
 - You can zoom in or zoom out with pinch to zoom.
 
@@ -56,13 +56,26 @@ minSdkVersion 21
 TODO: Here is a small example flutter app displaying a full screen camera preview with taking multiple images.
 
 ```dart
-Scaffold(
-body : MultipleImageCamera()
-)
+List<MediaModel> images = [] ;
+ ElevatedButton(
+            child: const Text("Capture"),
+            onPressed: () async {
+            CameraFile.capture(context: context).then((value) {
+              setState(() {
+                images = value ;
+              });
+            });
+          
+            },
+          ),
+          
+          Expanded(
+            child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: images.length,
+                itemBuilder: (context, index) {
+                  return Image.file(File(images[index].file.path));
+                }),
+          )
 ```
 
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.

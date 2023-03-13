@@ -8,7 +8,6 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
-  audioplayers: ^3.0.1
   camera: ^0.10.3+2
   flutter:
     sdk: flutter
@@ -24,8 +23,10 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  uses-material-design: true
   assets:
     - assets/
+    - assets/icons/
   
   #
   # For details regarding assets in packages, see
