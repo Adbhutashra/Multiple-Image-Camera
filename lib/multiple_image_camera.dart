@@ -12,7 +12,8 @@ class MultipleImageCamera {
       images = await Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (BuildContext context) => CameraFile()));
+              builder: (BuildContext context) => const CameraFile()));
+    // ignore: empty_catches
     } catch (e) {
 
     }

@@ -4,7 +4,7 @@ import "package:flutter/material.dart";
 import "package:camera/camera.dart";
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:multiple_image_camera/image_Preview.dart';
+import 'package:multiple_image_camera/image_preview.dart';
 
 class CameraFile extends StatefulWidget {
   const CameraFile({super.key});
@@ -13,13 +13,12 @@ class CameraFile extends StatefulWidget {
   State<CameraFile> createState() => _CameraFileState();
 }
 
-class _CameraFileState extends State<CameraFile>
-    with TickerProviderStateMixin {
+class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
   double zoom = 0.0;
   double _scaleFactor = 1.0;
   double scale = 1.0;
   late List<CameraDescription> _cameras;
-   CameraController? _controller;
+  CameraController? _controller;
   List<XFile> imageFiles = [];
   List<MediaModel> imageList = <MediaModel>[];
   late int _currIndex;
@@ -67,6 +66,7 @@ class _CameraFileState extends State<CameraFile>
 
   Future<void> _initCamera() async {
     _cameras = await availableCameras();
+    // ignore: unnecessary_null_comparison
     if (_cameras != null) {
       _controller = CameraController(
         _cameras[0],
@@ -78,16 +78,14 @@ class _CameraFileState extends State<CameraFile>
         }
         setState(() {});
       });
-    } else {
-      print("No Camera Found");
-    }
+    } else {}
   }
 
   @override
   void initState() {
     _initCamera();
     _currIndex = 0;
-   
+
     super.initState();
   }
 
@@ -100,7 +98,7 @@ class _CameraFileState extends State<CameraFile>
           _scaleFactor = zoom * details.scale;
           _controller!.setZoomLevel(_scaleFactor);
         },
-        child: Container(
+        child: SizedBox(
             width: double.infinity,
             height: double.infinity,
             child: Stack(fit: StackFit.expand, children: [
@@ -114,6 +112,7 @@ class _CameraFileState extends State<CameraFile>
                     children: <Widget>[
                       Container(
                         alignment: Alignment.bottomLeft,
+                        // ignore: unnecessary_null_comparison
                         child: imageFiles[index] == null
                             ? const Text("No image captured")
                             : imageFiles.length - 1 == index
@@ -228,19 +227,6 @@ class _CameraFileState extends State<CameraFile>
                                 ),
                             child: _currIndex == 0
                                 ? Container(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: Container(
-                                        // height: 200,
-                                        // width: 200,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                    ),
-                                    // height: 300,
-                                    // width: 300,
                                     decoration: BoxDecoration(
                                       border: Border.all(
                                         color: Colors.white,
@@ -248,21 +234,17 @@ class _CameraFileState extends State<CameraFile>
                                       shape: BoxShape.circle,
                                     ),
                                     key: const ValueKey("icon1"),
-                                  )
-                                : Container(
                                     child: Padding(
                                       padding: const EdgeInsets.all(2.0),
                                       child: Container(
-                                        // height: 200,
-                                        // width: 200,
                                         decoration: const BoxDecoration(
                                           color: Colors.white,
                                           shape: BoxShape.circle,
                                         ),
                                       ),
                                     ),
-                                    // height: 300,
-                                    // width: 300,
+                                  )
+                                : Container(
                                     decoration: BoxDecoration(
                                       border: Border.all(
                                         color: Colors.white,
@@ -270,6 +252,15 @@ class _CameraFileState extends State<CameraFile>
                                       shape: BoxShape.circle,
                                     ),
                                     key: const ValueKey("icon2"),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    ),
                                   )),
                         onPressed: () {
                           _currIndex = _currIndex == 0 ? 1 : 0;
@@ -298,9 +289,8 @@ class _CameraFileState extends State<CameraFile>
 
     try {
       await _controller!.initialize();
-    } on CameraException catch (e) {
-      print(e);
-    }
+    // ignore: empty_catches
+    } on CameraException {}
     if (mounted) {
       setState(() {});
     }
@@ -316,8 +306,7 @@ class _CameraFileState extends State<CameraFile>
         addImages(image);
         HapticFeedback.lightImpact();
       });
-    } on CameraException catch (e) {
-      print('Error occured while taking picture: $e');
+    } on CameraException {
       return null;
     }
   }
@@ -346,7 +335,7 @@ class _CameraFileState extends State<CameraFile>
                   onTap: () {
                     for (int i = 0; i < imageFiles.length; i++) {
                       File file = File(imageFiles[i].path);
-                      imageList.add(new MediaModel.blob(
+                      imageList.add(MediaModel.blob(
                           file, "", file.readAsBytesSync()));
                     }
                     Navigator.pop(context, imageList);
@@ -360,7 +349,7 @@ class _CameraFileState extends State<CameraFile>
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       extendBody: true,
       body: _buildCameraPreview(),
     );
@@ -370,9 +359,10 @@ class _CameraFileState extends State<CameraFile>
   void dispose() {
     if (_controller != null) {
       _controller!.dispose();
-    } else if (_animationController != null) {
+    } else {
       _animationController.dispose();
     }
+
 
     super.dispose();
   }

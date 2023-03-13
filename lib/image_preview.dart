@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -7,9 +6,10 @@ class ImagePreviewView extends StatefulWidget {
   final File file;
   final String imageTitle;
 
-  ImagePreviewView(this.file, this.imageTitle, {super.key});
+  const ImagePreviewView(this.file, this.imageTitle, {super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ImagePreviewViewState createState() => _ImagePreviewViewState();
 }
 
@@ -18,14 +18,14 @@ class _ImagePreviewViewState extends State<ImagePreviewView> {
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
-      SystemUiOverlay.bottom, 
+      SystemUiOverlay.bottom,
     ]);
   }
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.manual, overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     super.dispose();
   }
 
@@ -39,7 +39,7 @@ class _ImagePreviewViewState extends State<ImagePreviewView> {
         elevation: 1,
         title: Text(
           widget.imageTitle,
-          style: TextStyle(
+          style: const TextStyle(
               fontWeight: FontWeight.w700, color: Colors.white, fontSize: 16),
         ),
       ),
@@ -52,11 +52,8 @@ class _ImagePreviewViewState extends State<ImagePreviewView> {
         child: SafeArea(
           child: SingleChildScrollView(
               reverse: true,
-              child: Container(
-                
+              child: SizedBox(
                 width: double.infinity,
-                
-
                 child: Hero(
                   tag: widget.file.path,
                   child: Image.file(
@@ -72,10 +69,11 @@ class _ImagePreviewViewState extends State<ImagePreviewView> {
   }
 
   Future decodeImage() async {
+    // ignore: prefer_typing_uninitialized_variables
     var decodedImage;
 
     decodedImage = await decodeImageFromList(widget.file.readAsBytesSync());
-    print("------------> ${decodedImage.width}");
+   
     return decodedImage.width.toDouble();
   }
 }
