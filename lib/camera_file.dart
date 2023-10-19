@@ -68,10 +68,8 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
     _cameras = await availableCameras();
     // ignore: unnecessary_null_comparison
     if (_cameras != null) {
-      _controller = CameraController(
-        _cameras[0],
-        ResolutionPreset.ultraHigh,
-      );
+      _controller = CameraController(_cameras[0], ResolutionPreset.ultraHigh,
+          enableAudio: false);
       _controller!.initialize().then((_) {
         if (!mounted) {
           return;
@@ -280,8 +278,9 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
     if (_controller != null) {
       await _controller!.dispose();
     }
-    _controller =
-        CameraController(cameraDescription, ResolutionPreset.ultraHigh);
+    _controller = CameraController(
+        cameraDescription, ResolutionPreset.ultraHigh,
+        enableAudio: false);
     _controller!.addListener(() {
       if (mounted) setState(() {});
       if (_controller!.value.hasError) {}
