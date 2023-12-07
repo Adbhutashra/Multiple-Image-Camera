@@ -60,7 +60,7 @@ List<MediaModel> images = [] ;
  ElevatedButton(
             child: const Text("Capture"),
             onPressed: () async {
-            CameraFile.capture(context: context).then((value) {
+            MultipleImageCamera.capture(context: context).then((value) {
               setState(() {
                 images = value ;
               });
