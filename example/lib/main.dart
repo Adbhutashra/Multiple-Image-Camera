@@ -45,7 +45,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ElevatedButton(
             child: const Text("Capture"),
             onPressed: () async {
-              MultipleImageCamera.capture(context: context).then((value) {
+              MultipleImageCamera.capture(
+                context: context,
+              ).then((value) {
                 setState(() {
                   images = value;
                 });
