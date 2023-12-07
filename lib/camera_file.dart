@@ -3,11 +3,11 @@ import 'dart:io';
 import "package:flutter/material.dart";
 import "package:camera/camera.dart";
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:multiple_image_camera/image_preview.dart';
 
 class CameraFile extends StatefulWidget {
-  const CameraFile({super.key});
+  final Widget? customButton;
+  const CameraFile({super.key, this.customButton});
 
   @override
   State<CameraFile> createState() => _CameraFileState();
@@ -46,32 +46,34 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
     });
   }
 
-  Widget _animatedButton() {
-    return Container(
-      height: 70,
-      width: 150,
-      decoration: BoxDecoration(
-        color: Colors.white38,
-        borderRadius: BorderRadius.circular(100.0),
-      ),
-      child: const Center(
-        child: Text(
-          'Done',
-          style: TextStyle(
-              fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-      ),
-    );
+  Widget? _animatedButton({Widget? customContent}) {
+    return customContent != null
+        ? customContent
+        : Container(
+            height: 70,
+            width: 150,
+            decoration: BoxDecoration(
+              color: Colors.white38,
+              borderRadius: BorderRadius.circular(100.0),
+            ),
+            child: const Center(
+              child: Text(
+                'Done',
+                style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+              ),
+            ),
+          );
   }
 
   Future<void> _initCamera() async {
     _cameras = await availableCameras();
     // ignore: unnecessary_null_comparison
     if (_cameras != null) {
-      _controller = CameraController(
-        _cameras[0],
-        ResolutionPreset.ultraHigh,
-      );
+      _controller = CameraController(_cameras[0], ResolutionPreset.ultraHigh,
+          enableAudio: false);
       _controller!.initialize().then((_) {
         if (!mounted) {
           return;
@@ -149,8 +151,11 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
                                                   removeImage();
                                                 });
                                               },
-                                              child: SvgPicture.asset(
-                                                  "assets/icons/closeOrange.svg"),
+                                              child: Image.network(
+                                                "https://logowik.com/content/uploads/images/close1437.jpg",
+                                                height: 30,
+                                                width: 30,
+                                              ),
                                             ),
                                           )
                                         ],
@@ -237,6 +242,8 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
                                     child: Padding(
                                       padding: const EdgeInsets.all(2.0),
                                       child: Container(
+                                        height: 50,
+                                        width: 50,
                                         decoration: const BoxDecoration(
                                           color: Colors.white,
                                           shape: BoxShape.circle,
@@ -255,6 +262,8 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
                                     child: Padding(
                                       padding: const EdgeInsets.all(2.0),
                                       child: Container(
+                                        height: 50,
+                                        width: 50,
                                         decoration: const BoxDecoration(
                                           color: Colors.white,
                                           shape: BoxShape.circle,
@@ -280,8 +289,9 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
     if (_controller != null) {
       await _controller!.dispose();
     }
-    _controller =
-        CameraController(cameraDescription, ResolutionPreset.ultraHigh);
+    _controller = CameraController(
+        cameraDescription, ResolutionPreset.ultraHigh,
+        enableAudio: false);
     _controller!.addListener(() {
       if (mounted) setState(() {});
       if (_controller!.value.hasError) {}
@@ -289,7 +299,7 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
 
     try {
       await _controller!.initialize();
-    // ignore: empty_catches
+      // ignore: empty_catches
     } on CameraException {}
     if (mounted) {
       setState(() {});
@@ -335,14 +345,14 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
                   onTap: () {
                     for (int i = 0; i < imageFiles.length; i++) {
                       File file = File(imageFiles[i].path);
-                      imageList.add(MediaModel.blob(
-                          file, "", file.readAsBytesSync()));
+                      imageList.add(
+                          MediaModel.blob(file, "", file.readAsBytesSync()));
                     }
                     Navigator.pop(context, imageList);
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(right: 8.0),
-                    child: _animatedButton(),
+                    child: _animatedButton(customContent: widget.customButton),
                   ))
               : const SizedBox()
         ],
@@ -362,7 +372,6 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
     } else {
       _animationController.dispose();
     }
-
 
     super.dispose();
   }
