@@ -7,7 +7,18 @@ import 'package:multiple_image_camera/image_preview.dart';
 
 class CameraFile extends StatefulWidget {
   final Widget? customButton;
-  const CameraFile({super.key, this.customButton});
+  final Widget? rotateCameraIcon;
+  final ButtonStyle? backButtonStyle;
+  final Icon? cancelIcon;
+  final int? maxPictures;
+  const CameraFile({
+    super.key,
+    this.customButton,
+    this.rotateCameraIcon,
+    this.backButtonStyle,
+    this.cancelIcon,
+    this.maxPictures,
+  });
 
   @override
   State<CameraFile> createState() => _CameraFileState();
@@ -27,9 +38,23 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
   late AnimationController controller;
   late Animation<double> scaleAnimation;
 
-  addImages(XFile image) {
+  hasCapturesAllImages(){
+    if (widget.maxPictures == null){
+      return null;
+    }
+    if (imageFiles.length >= widget.maxPictures!){
+      for (int i = 0; i < imageFiles.length; i++) {
+        File file = File(imageFiles[i].path);
+        imageList.add(
+            MediaModel.blob(file, "", file.readAsBytesSync()));
+      }
+      _animationController.stop();
+      Navigator.pop(context, imageList);
+    }
+  }
+
+  runAnimation(){
     setState(() {
-      imageFiles.add(image);
       _animationController = AnimationController(
           vsync: this, duration: const Duration(milliseconds: 1500));
       animation = Tween<double>(begin: 400, end: 1).animate(scaleAnimation =
@@ -37,7 +62,15 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
               parent: _animationController, curve: Curves.elasticOut))
         ..addListener(() {});
       _animationController.forward();
+      HapticFeedback.lightImpact();
+    },);
+  }
+
+  addImages(XFile image) {
+    setState(() {
+      imageFiles.add(image);
     });
+    hasCapturesAllImages();
   }
 
   removeImage() {
@@ -47,7 +80,7 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
   }
 
   Widget? _animatedButton({Widget? customContent}) {
-    return customContent != null
+    return (customContent != null)
         ? customContent
         : Container(
             height: 70,
@@ -134,6 +167,7 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
                                                         )));
                                       },
                                       child: Stack(
+                                        clipBehavior: Clip.none,
                                         children: [
                                           Image.file(
                                             File(
@@ -143,18 +177,18 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
                                             width: 60,
                                           ),
                                           Positioned(
-                                            top: 0,
-                                            right: 0,
+                                            top: -17,
+                                            right: -15,
                                             child: GestureDetector(
                                               onTap: () {
                                                 setState(() {
                                                   removeImage();
                                                 });
                                               },
-                                              child: Image.network(
-                                                "https://logowik.com/content/uploads/images/close1437.jpg",
-                                                height: 30,
-                                                width: 30,
+                                              child: (widget.cancelIcon != null) ? widget.cancelIcon : const Icon(
+                                                Icons.cancel,
+                                                color: Colors.white,
+                                                size: 35,
                                               ),
                                             ),
                                           )
@@ -197,7 +231,7 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
                 left: 0,
                 child: IconButton(
                   iconSize: 40,
-                  icon: const Icon(
+                  icon: (widget.rotateCameraIcon != null) ? widget.rotateCameraIcon! : const Icon(
                     Icons.camera_front,
                     color: Colors.white,
                   ),
@@ -272,6 +306,7 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
                                     ),
                                   )),
                         onPressed: () {
+                          runAnimation();
                           _currIndex = _currIndex == 0 ? 1 : 0;
                           takePicture();
                         },
@@ -356,6 +391,13 @@ class _CameraFileState extends State<CameraFile> with TickerProviderStateMixin {
                   ))
               : const SizedBox()
         ],
+        leading: BackButton(
+          style: (widget.backButtonStyle != null) ? widget.backButtonStyle : ButtonStyle(
+            iconColor: MaterialStateProperty.all<Color>(Colors.white),
+            iconSize: MaterialStateProperty.all<double>(50)
+          ),
+          onPressed: () => Navigator.pop(context, imageList),
+        ),
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
